@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/jefawks3/activerecord_cursor_pagination/tree/main.svg?style=svg)](https://circleci.com/gh/jefawks3/activerecord_cursor_pagination/tree/main)
+![Tests](https://github.com/jefawks3/activerecord_cursor_pagination/actions/workflows/test.yml/badge.svg)
 
 # ActiverecordCursorPagination
 
