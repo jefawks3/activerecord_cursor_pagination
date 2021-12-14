@@ -1,3 +1,4 @@
+[![Gem Version](https://badge.fury.io/rb/activerecord_cursor_pagination.svg)](https://badge.fury.io/rb/activerecord_cursor_pagination)
 ![Tests](https://github.com/jefawks3/activerecord_cursor_pagination/actions/workflows/test.yml/badge.svg)
 
 # ActiverecordCursorPagination
