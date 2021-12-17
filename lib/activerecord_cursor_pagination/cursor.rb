@@ -1,15 +1,17 @@
+# frozen_string_literal: true
+
 module ActiverecordCursorPagination
+  ##
+  # A cursor snapshot of a given page in the paginated query.
+  #
+  # @param [Class, String] klass_or_name The model class
+  # @param [ActiveRecord::Relation, String] sql_or_signed_sql The active record SQL relation
+  # @param [Integer] per_page The number of records per page
+  # @param [Integer] start_id The ID of the first record in the page
+  # @param [Integer] end_id The ID of the last record in the page
   class Cursor
     attr_reader :klass_name, :signed_sql, :per_page, :start_id, :end_id
 
-    ##
-    # Initialize a cursor
-    #
-    # @param [Class, String] klass_or_name The model class
-    # @param [ActiveRecord::Relation, String] sql_or_signed_sql The active record SQL relation
-    # @param [Integer] per_page The number of records per page
-    # @param [Integer] start_id The ID of the first record in the page
-    # @param [Integer] end_id The ID of the last record in the page
     def initialize(klass_or_name, sql_or_signed_sql, per_page, start_id, end_id)
       @signed_sql = sql_or_signed_sql.is_a?(String) ? sql_or_signed_sql : sql_signer.sign(sql_or_signed_sql)
       @klass_name = class_formatter.format klass_or_name
@@ -56,7 +58,7 @@ module ActiverecordCursorPagination
       serializer.serialize to_hash
     end
 
-    alias_method :to_param, :to_s
+    alias to_param to_s
 
     ##
     # Validates the cursor
@@ -67,13 +69,14 @@ module ActiverecordCursorPagination
     #
     # @raise [InvalidCursorError] If cursor is not valid
     def validate!(klass, sql, per_page)
-      raise InvalidCursorError.new('Invalid cursor', self) unless valid?(klass, sql, per_page)
+      raise InvalidCursorError.new("Invalid cursor", self) unless valid?(klass, sql, per_page)
     end
 
     private
 
     delegate :class_formatter, :sql_signer, :serializer, to: :class
 
+    # rubocop:disable Style/CaseEquality
     def valid?(klass, sql, per_page)
       formatted_class = class_formatter.format klass
       signed_sql = sql.is_a?(String) ? sql : sql_signer.sign(sql)
@@ -82,6 +85,7 @@ module ActiverecordCursorPagination
         @signed_sql === signed_sql &&
         @per_page === per_page
     end
+    # rubocop:enable Style/CaseEquality
 
     class << self
       ##

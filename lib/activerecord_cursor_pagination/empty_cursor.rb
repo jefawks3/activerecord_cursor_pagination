@@ -1,4 +1,8 @@
+# frozen_string_literal: true
+
 module ActiverecordCursorPagination
+  ##
+  # An empty cursor when no records are found or the cursor page is empty
   class EmptyCursor
     ##
     # Is the cursor not empty
@@ -21,7 +25,7 @@ module ActiverecordCursorPagination
     #
     # @return [String] The serialized cursor
     def to_s
-      ''
+      ""
     end
 
     alias_method :to_param, :to_s

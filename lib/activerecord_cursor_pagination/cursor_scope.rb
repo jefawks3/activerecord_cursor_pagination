@@ -1,29 +1,33 @@
+# frozen_string_literal: true
+
 module ActiverecordCursorPagination
+  ##
+  # Paginated cursor scope result.
+  #
+  # @example Empty cursor
+  #   Posts.where(published: true).order(created_at: :desc).cursor(nil, per: 100)
+  #   Posts.where(published: true).order(created_at: :desc).cursor("", per: 100)
+  #   Posts.where(published: true).order(created_at: :desc).cursor(EmptyCursor.new, per: 100)
+  #
+  # @example Serialized cursor
+  #   Posts.where(published: true).order(created_at: :desc).cursor("SerializedCursorString", per: 100)
+  #
+  # @example Record cursor
+  #   Posts.where(published: true).order(created_at: :desc).cursor(Post.find!(6), per: 100)
+  #
+  # @example Cursor
+  #   cursor = ...deserialized cursor...
+  #   Posts.where(published: true).order(created_at: :desc).cursor(cursor, per: 100)
+  #
+  # @param [Class] klass Model class
+  # @param [ActiveRecord::Relation] scope The database query.
+  # @param [String, Cursor, EmptyCursor, ActiveRecord::Base, nil] cursor The current page cursor.
+  # @option [Integer] per The number of records per page.
+  #
+  # @raise [InvalidCursorError] When the cursor is does not match the query or the cursor is not a valid type.
   class CursorScope
     attr_reader :per_page
 
-    ##
-    # @example Empty cursor
-    #   Posts.where(published: true).order(created_at: :desc).cursor(nil, per: 100)
-    #   Posts.where(published: true).order(created_at: :desc).cursor("", per: 100)
-    #   Posts.where(published: true).order(created_at: :desc).cursor(EmptyCursor.new, per: 100)
-    #
-    # @example Serialized cursor
-    #   Posts.where(published: true).order(created_at: :desc).cursor("SerializedCursorString", per: 100)
-    #
-    # @example Record cursor
-    #   Posts.where(published: true).order(created_at: :desc).cursor(Post.find!(6), per: 100)
-    #
-    # @example Cursor
-    #   cursor = ...deserialized cursor...
-    #   Posts.where(published: true).order(created_at: :desc).cursor(cursor, per: 100)
-    #
-    # @param [Class] klass Model class
-    # @param [ActiveRecord::Relation] scope The database query.
-    # @param [String, Cursor, EmptyCursor, ActiveRecord::Base, nil] cursor The current page cursor.
-    # @option [Integer] per The number of records per page.
-    #
-    # @raise [InvalidCursorError] When the cursor is does not match the query or the cursor is not a valid type.
     def initialize(klass, scope, cursor, per: 15)
       @scope = scope.except :offset, :limit
       @klass = klass
@@ -41,7 +45,7 @@ module ActiverecordCursorPagination
     #
     # @return [Boolean] True if only one record per page
     def single_record?
-      @per_page === 1
+      @per_page == 1
     end
 
     ##
@@ -140,8 +144,7 @@ module ActiverecordCursorPagination
     #
     # @return [Boolean] True if there is previous page
     def previous_page?
-      return false if scope_empty?
-      previous_page_scope.any?
+      !scope_empty? && previous_page_scope.any?
     end
 
     ##
@@ -149,8 +152,7 @@ module ActiverecordCursorPagination
     #
     # @return [Boolean] True if there is a next page
     def next_page?
-      return false if scope_empty?
-      next_page_scope.any?
+      !scope_empty? && next_page_scope.any?
     end
 
     ##
@@ -183,6 +185,7 @@ module ActiverecordCursorPagination
     # @return [String]
     def next_cursor
       return EmptyCursor.to_param unless next_page?
+
       ids = next_page_scope.pluck(:id)
       Cursor.to_param @klass, @scope, @per_page, ids.first, ids.last
     end
@@ -195,6 +198,7 @@ module ActiverecordCursorPagination
     # @return [ActiveRecord::Base]
     def next_cursor_record
       raise NotSingleRecordError unless single_record?
+
       next_page_scope.first if next_page?
     end
 
@@ -204,6 +208,7 @@ module ActiverecordCursorPagination
     # @return [String]
     def previous_cursor
       return EmptyCursor.to_param unless previous_page?
+
       ids = previous_page_scope.pluck(:id)
       Cursor.to_param @klass, @scope, @per_page, ids.last, ids.first
     end
@@ -216,6 +221,7 @@ module ActiverecordCursorPagination
     # @return [ActiveRecord::Base]
     def previous_cursor_record
       raise NotSingleRecordError unless single_record?
+
       previous_page_scope.first if previous_page?
     end
 
@@ -224,7 +230,7 @@ module ActiverecordCursorPagination
     #
     # @yield [ActiveRecord::Base] Invokes the block with each active record.
     def each(&block)
-      current_page_scope.each &block
+      current_page_scope.each(&block)
     end
 
     ##
@@ -244,7 +250,7 @@ module ActiverecordCursorPagination
     #
     # @yield [ActiveRecord::Base] Invokes the block with each active record.
     def map(&block)
-      current_page_scope.map &block
+      current_page_scope.map(&block)
     end
 
     ##
@@ -279,7 +285,7 @@ module ActiverecordCursorPagination
         @scope = @scope.order order_column.order_sql
       end
 
-      @id_column_index = @order_columns.find_index &:base_id?
+      @id_column_index = @order_columns.find_index(&:base_id?)
     end
 
     def initialize_cursor(cursor)

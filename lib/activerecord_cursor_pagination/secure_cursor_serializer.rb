@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ActiverecordCursorPagination
   ##
   # Secure cursor serializer implementation using AES 256 encryption.
@@ -34,7 +36,7 @@ module ActiverecordCursorPagination
     private
 
     def cipher
-      OpenSSL::Cipher.new 'aes-256-cbc'
+      OpenSSL::Cipher.new "aes-256-cbc"
     end
 
     def cipher_key

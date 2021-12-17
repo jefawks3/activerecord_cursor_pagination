@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 module ActiverecordCursorPagination
-  module Extension
+  module Extension # :nodoc:
     extend ActiveSupport::Concern
 
-    module ClassMethods
+    module ClassMethods # :nodoc:
       def inherited(kls)
         super
         kls.send :include, ModelExtension if kls.superclass == ActiveRecord::Base

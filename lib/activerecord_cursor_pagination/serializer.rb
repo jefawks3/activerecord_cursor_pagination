@@ -1,4 +1,10 @@
+# frozen_string_literal: true
+
 module ActiverecordCursorPagination
+  ##
+  # Cursor serializer base class.
+  #
+  # @abstract
   class Serializer
     ##
     # Deserialize the cursor.

@@ -1,7 +1,10 @@
+# frozen_string_literal: true
+
 module ActiverecordCursorPagination
-  module ModelExtension
+  module ModelExtension # :nodoc:
     extend ActiveSupport::Concern
 
+    # rubocop:disable Metrics/BlockLength
     class_methods do
       ##
       # Get the paginated cursor for the current query
@@ -33,11 +36,13 @@ module ActiverecordCursorPagination
       def cursor_batch(batch_size: 1000, &block)
         current_cursor = nil
 
-        begin
+        loop do
           cursor = cursor current_cursor, per: batch_size
           block.call cursor
           current_cursor = cursor.next_cursor
-        end until cursor.last_page?
+
+          break if cursor.last_page?
+        end
       end
 
       ##
@@ -51,7 +56,7 @@ module ActiverecordCursorPagination
       def cursor_batch_with_index(batch_size: 1000, &block)
         i = 0
 
-        self.cursor_batch batch_size: batch_size do |c|
+        cursor_batch batch_size: batch_size do |c|
           block.call c, i
           i += 1
         end
@@ -66,8 +71,8 @@ module ActiverecordCursorPagination
       #
       # @yield [record] Invokes the block with a record for each result.
       def cursor_find_each(batch_size: 1000, &block)
-        self.cursor_batch batch_size: batch_size do |c|
-          c.each &block
+        cursor_batch batch_size: batch_size do |c|
+          c.each(&block)
         end
       end
 
@@ -82,7 +87,7 @@ module ActiverecordCursorPagination
       def cursor_find_each_with_index(batch_size: 1000, &block)
         i = 0
 
-        self.cursor_batch batch_size: batch_size do |c|
+        cursor_batch batch_size: batch_size do |c|
           c.each do |r|
             block.call r, i
             i += 1
@@ -91,4 +96,5 @@ module ActiverecordCursorPagination
       end
     end
   end
+  # rubocop:enable Metrics/BlockLength
 end

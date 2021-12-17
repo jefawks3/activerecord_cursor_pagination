@@ -34,13 +34,14 @@ Gem::Specification.new do |spec|
   spec.add_dependency "json", ">= 2.5"
 
   # Development Dependencies
+  spec.add_development_dependency "bundler", ">= 1.15"
+  spec.add_development_dependency "coveralls"
+  spec.add_development_dependency "database_cleaner"
+  spec.add_development_dependency "faker"
   spec.add_development_dependency "rake", "~> 13.0"
   spec.add_development_dependency "rspec", "~> 3.0"
-  spec.add_development_dependency "rspec-mocks", '~> 3.4'
+  spec.add_development_dependency "rspec-mocks", "~> 3.4"
   spec.add_development_dependency "rubocop", "~> 1.21"
-  spec.add_development_dependency 'bundler', '>= 1.15'
-  spec.add_development_dependency 'coveralls'
-  spec.add_development_dependency 'database_cleaner'
-  spec.add_development_dependency 'sqlite3'
-  spec.add_development_dependency 'faker'
+  spec.add_development_dependency "rubocop-rspec", "~> 2.6"
+  spec.add_development_dependency "sqlite3"
 end

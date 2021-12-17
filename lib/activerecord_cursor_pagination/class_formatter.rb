@@ -1,4 +1,8 @@
+# frozen_string_literal: true
+
 module ActiverecordCursorPagination
+  ##
+  # Class name format helper.
   class ClassFormatter
     ##
     # Format the class name

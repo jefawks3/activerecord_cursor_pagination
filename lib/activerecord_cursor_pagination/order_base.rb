@@ -1,15 +1,19 @@
+# frozen_string_literal: true
+
 module ActiverecordCursorPagination
+  ##
+  # Query order value
+  #
+  # @abstract
+  #
+  # @param [String] table The table name.
+  # @param [String] name The name of the column.
+  # @param [Integer] index The index of the order column.
   class OrderBase
-    attr_reader :table, :name, :index, :direction
+    attr_reader :table, :name, :index
 
     attr_accessor :base_id
 
-    ##
-    # Initialize the OrderBase.
-    #
-    # @param [String] table The table name.
-    # @param [String] name The name of the column.
-    # @param [Integer] index The index of the order column.
     def initialize(table, name, index)
       @table = ActiverecordCursorPagination.strip_quotes table
       @name = ActiverecordCursorPagination.strip_quotes name
@@ -206,7 +210,7 @@ module ActiverecordCursorPagination
       #
       # @return [OrderBase]
       def parse_string(string_or_sql_literal, index)
-        string_or_sql_literal.strip!
+        string_or_sql_literal = string_or_sql_literal.strip
 
         table_column, dir = if (match = string_or_sql_literal.match(/\A(?<rest>.*)\s+(?<order>ASC|DESC)\z/i))
                               [match[:rest]&.strip, match[:order]&.downcase]
@@ -215,8 +219,6 @@ module ActiverecordCursorPagination
                             end
 
         order_klass = order_factory dir
-
-
         table, column = parse_table_column table_column.to_s.strip
 
         if column.nil? || column.empty?
@@ -256,16 +258,16 @@ module ActiverecordCursorPagination
       #
       # @param [String, Symbol] direction The direction of the order column.
       def order_factory(direction)
-        direction&.to_s&.downcase === 'desc' ? DescendingOrder : AscendingOrder
+        direction&.to_s&.downcase == "desc" ? DescendingOrder : AscendingOrder
       end
 
       private
 
       def parse_table_column(str)
-        # FIXME Double quoted strings vs column and table names
+        # FIXME: Double quoted strings vs column and table names
         #   Strings must be single quoted or the REGEXP will remove the double quotes creating invalid sql statement.
         if str =~ /\A["']?[\w_]+['"]?\.?['"]?[\w_]+['"]?\z/
-          str.scan /[^".]+|"[^"]*"/
+          str.scan(/[^".]+|"[^"]*"/)
         else
           [nil, str]
         end

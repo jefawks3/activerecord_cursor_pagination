@@ -1,6 +1,11 @@
+# frozen_string_literal: true
+
 module ActiverecordCursorPagination
+  ##
+  # Plugin configuration instance.
   class Configuration
-    attr_accessor :serializer, :secret_key
+    attr_accessor :serializer
+    attr_writer :secret_key
 
     def initialize
       setup_defaults
@@ -16,7 +21,8 @@ module ActiverecordCursorPagination
     #
     # @return [String] The secret key.
     def secret_key
-      raise NoSecretKeyError, 'No secret key is defined' if @secret_key.nil? || @secret_key.empty?
+      raise NoSecretKeyError, "No secret key is defined" if @secret_key.nil? || @secret_key.empty?
+
       @secret_key
     end
 

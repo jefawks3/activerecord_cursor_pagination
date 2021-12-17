@@ -1,6 +1,9 @@
-module ActiverecordCursorPagination
-  class SqlSigner
+# frozen_string_literal: true
 
+module ActiverecordCursorPagination
+  ##
+  # Generate a signature based on the SQL query
+  class SqlSigner
     ##
     # Sign SQL
     #
@@ -11,10 +14,10 @@ module ActiverecordCursorPagination
       return nil if sql.nil?
 
       sql = format sql
-      digest = OpenSSL::Digest.new 'sha1'
+      digest = OpenSSL::Digest.new "sha1"
       hmac = OpenSSL::HMAC.digest digest, secret_key, sql
       hash = Base64.encode64 hmac
-      hash.gsub /\n+/, ""
+      hash.gsub(/\n+/, "")
     end
 
     private
@@ -25,7 +28,7 @@ module ActiverecordCursorPagination
 
     def format(sql)
       sql_str = sql.only(:joins, :where, :order).to_sql
-      sql_str.gsub(/[\s\t]*/, ' ').gsub(/\n+/, ' ')
+      sql_str.gsub(/[\s\t]*/, " ").gsub(/\n+/, " ")
     end
   end
 end
